@@ -3,7 +3,7 @@ mod schema;
 
 use clap::{ command, builder::styling, Command };
 use dialoguer::{ Select, theme::ColorfulTheme };
-use crate::actions::{ get_template_based_on_stack, parse_to_exepected_enum };
+use crate::actions::{ get_template_based_on_stack, parse_to_expected_enum };
 
 fn main() {
     let ascii_art =
@@ -45,7 +45,7 @@ fn main() {
         .subcommand(
             Command::new("graphql")
                 .short_flag('g')
-                .about("Create a frontend project to be used with a REST Backend")
+                .about("Create a frontend project to be used with a GraphQL Backend")
         )
         .get_matches();
 
@@ -60,7 +60,7 @@ fn main() {
                 Ok(selection) => {
                     let selected_stack = &frontend_stacks[selection];
 
-                    if let Some(item) = parse_to_exepected_enum(selected_stack) {
+                    if let Some(item) = parse_to_expected_enum(selected_stack) {
                         get_template_based_on_stack(item);
                     }
                 }
@@ -69,7 +69,7 @@ fn main() {
         }
 
         Some("graphql") => {
-            println!("Generating project with REST API stack...");
+            println!("Generating project with GRAPHQL API stack...");
         }
         _ => {
             eprintln!("Invalid command. Use --help for usage information.");
