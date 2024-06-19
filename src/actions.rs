@@ -1,7 +1,7 @@
 use crate::schema::{ AUTH_OPTIONS, NEXT_JS_ADDONS, PACKAGE_MANAGERS, create_addons_map };
 use dialoguer::{ theme::ColorfulTheme, Input, MultiSelect, Select };
 use serde_json::{ Map, Value };
-use std::process::{ Command, Stdio };
+use std::process::Command ;
 
 pub enum FrontendStack {
     Nextjs,
@@ -160,27 +160,6 @@ pub fn create_nextjs_project(config: Map<String, Value>) {
             // if let Some(Value::String(auth_option)) = config.get("auth_option") {
             //     command.arg(auth_option);
             // }
-        }
-    }
-}
-
-    let mut command = Command::new("npx");
-    command.arg("create-next-app");
-    command.arg("my-nextjs-app");
-
-    println!("Executing command: {:?}", command);
-
-    // Execute the command
-    let result = command.status();
-
-    match result {
-        Err(err) => eprintln!("An error occurred:{}", err),
-        Ok(status) => {
-            if status.success() {
-                println!("Project created successfully.");
-            } else {
-                eprintln!("Command executed with non-zero exit code: {}", status);
-            }
         }
     }
 }
