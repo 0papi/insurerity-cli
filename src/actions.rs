@@ -2,6 +2,7 @@ use crate::schema::{ AUTH_OPTIONS, NEXT_JS_ADDONS, PACKAGE_MANAGERS, create_addo
 use dialoguer::{ theme::ColorfulTheme, Input, MultiSelect, Select };
 use serde_json::{ Map, Value };
 use std::process::Command;
+use indicatif::ProgressBar;
 
 pub enum FrontendStack {
     Nextjs,
@@ -99,12 +100,9 @@ pub fn get_template_based_on_stack(arg: FrontendStack) {
 pub fn create_nextjs_project(config: Map<String, Value>) {
     let mut command = Command::new("npx");
     command.arg("create-next-app");
-    // let mut command_string = String::from("npx create-next-app");
 
     if let Some(Value::String(project_name)) = config.get("project_name") {
-        println!("Project name: {:?}", project_name);
         command.arg(project_name);
-        // command_string.push_str(&format!(" {}", project_name));
     }
 
     // Add addons if any
@@ -115,12 +113,10 @@ pub fn create_nextjs_project(config: Map<String, Value>) {
                 if let Some(addon_value) = addons_map.get(addon_str.as_str()) {
                     match *addon_value {
                         "tailwindcss" => {
-                            // command_string.push_str(&format!(" {}", "--tailwindcss"));
                             command.arg("--tailwindcss");
                         }
                         "typescript" => {
                             command.arg("--typescript");
-                            // command_string.push_str(&format!(" {}", "--typescript"));
                         }
                         "zustand" => {}
                         "react-query" => {}
@@ -131,33 +127,32 @@ pub fn create_nextjs_project(config: Map<String, Value>) {
         }
     }
     command.args(["--eslint", "--src-dir"]);
-    // command_string.push_str(format!(" {}", "--eslint").as_str());
-    // command_string.push_str(format!(" {}", "--src-dir").as_str());
 
     // Add package manager option
     if let Some(Value::String(package_manager)) = config.get("package_manager") {
         let pkm = format!("--use-{}", package_manager);
-        // command_string.push_str(format!(" {}", pkm).as_str());
+
         command.arg(&pkm);
     }
 
-    command.arg("--interactive=false"); // so that npm does not run in raw mode?
 
-    // Print the command for debugging purposes
-    println!("Executing command: {:?}", command);
+    let bar = ProgressBar::new(1000);
+    bar.set_message("Installing Nextjs project");
+    for _ in 0..1000 {
+        bar.inc(1);
+        let result = command.spawn();
+        match result {
+            Err(err) => eprintln!("An error occurred:{}", err),
+            Ok(_res) => {
+                //TODO: When initial scaffold is done install any additional packages and configs
 
-    // let mut cmd = Command::new(&command_string);
-    let result = command.spawn();
-
-    match result {
-        Err(err) => eprintln!("An error occurred:{}", err),
-        Ok(_res) => {
-            //TODO: When initial scaffold is done install any additional packages and configs
-
-            // // Add authentication option
-            // if let Some(Value::String(auth_option)) = config.get("auth_option") {
-            //     command.arg(auth_option);
-            // }
+                // // Add authentication option
+                // if let Some(Value::String(auth_option)) = config.get("auth_option") {
+                //     command.arg(auth_option);
+                // }
+            }
         }
     }
+
+    bar.finish();
 }
